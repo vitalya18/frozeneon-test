@@ -79,8 +79,9 @@ var app = new Vue({
 				axios.post(
 					'/main_page/comment',
 					comment
-				).then(function () {
-
+				).then(function (response) {
+					self.commentText = '';
+					self.post.coments.push(response.data.comment);
 				});
 			}
 
@@ -97,6 +98,7 @@ var app = new Vue({
 				axios.post('/main_page/add_money', sum)
 					.then(function (response) {
 						setTimeout(function () {
+							self.addSum = '';
 							$('#addModal').modal('hide');
 						}, 500);
 					})
@@ -141,4 +143,3 @@ var app = new Vue({
 		}
 	}
 });
-

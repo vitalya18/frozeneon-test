@@ -85,6 +85,24 @@ class Boosterpack_info_model extends Emerald_model {
         return $this->item;
     }
 
+	public function get_boosterpack(): Boosterpack_model
+	{
+		if ( ! empty($this->boosterpack))
+		{
+			return $this->boosterpack;
+		}
+
+		try
+		{
+			$this->boosterpack = new Boosterpack_model($this->get_boosterpack_id());
+		} catch (Exception $e)
+		{
+			$this->boosterpack = new Boosterpack_model();
+		}
+
+		return $this->boosterpack;
+	}
+
     function __construct($id = NULL)
     {
         parent::__construct();
@@ -114,6 +132,18 @@ class Boosterpack_info_model extends Emerald_model {
         return App::get_s()->is_affected();
     }
 
+	/**
+	 * @param int $id
+	 * @return self
+	 * @throws Exception
+	 */
+	public static function get_by_id(int $id): self
+	{
+		return static::transform_one(App::get_s()->from(self::CLASS_TABLE)
+			->where(['id' => $id])
+			->one());
+	}
+
     /**
      * @param int $boosterpack_id
      *
@@ -127,4 +157,20 @@ class Boosterpack_info_model extends Emerald_model {
 
         return self::transform_many($data);
     }
+
+	/**
+	 * @param float $max_cost
+	 *
+	 * @return Boosterpack_info_model|null
+	 */
+    public static function get_random_item(int $max_cost): ?Boosterpack_info_model
+	{
+		$data = self::transform_one(App::get_s()->from(self::CLASS_TABLE)
+			->join('items', ['boosterpack_info.item_id' => 'items.id'])
+			->where('items.price <', $max_cost)
+			->sortDesc('RAND()')
+			->one());
+
+		return $data->is_loaded() ? $data : null;
+	}
 }
