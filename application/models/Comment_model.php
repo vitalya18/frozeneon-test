@@ -153,9 +153,9 @@ class Comment_model extends Emerald_Model {
     }
 
     /**
-     * @return Int
+     * @return int|null
      */
-    public function get_reply_id(): int
+    public function get_reply_id()
     {
         return $this->reply_id;
     }
@@ -237,6 +237,18 @@ class Comment_model extends Emerald_Model {
         return static::transform_many(App::get_s()->from(self::CLASS_TABLE)->where(['assign_id' => $assign_id])->orderBy('time_created', 'ASC')->many());
     }
 
+	/**
+	 * @param int $id
+	 * @return self
+	 * @throws Exception
+	 */
+	public static function get_by_id(int $id): self
+	{
+		return static::transform_one(App::get_s()->from(self::CLASS_TABLE)
+			->where(['id' => $id])
+			->one());
+	}
+
     /**
      * @param User_model $user
      *
@@ -245,12 +257,19 @@ class Comment_model extends Emerald_Model {
      */
     public function increment_likes(User_model $user): bool
     {
-        // TODO: task 3, лайк комментария
+        // TODO: task 3, лайк комментария +
+
+		$user->set_likes_balance($user->get_likes_balance() - 1);
+		return $this->set_likes(intval($this->get_likes()) + 1);
     }
 
     public static function get_all_by_replay_id(int $reply_id)
     {
-        // TODO task 2, дополнительно, вложенность комментариев
+        // TODO task 2, дополнительно, вложенность комментариев +
+
+		return static::transform_many(App::get_s()->from(self::CLASS_TABLE)
+			->where(['reply_id' => $reply_id])
+			->many());
     }
 
     /**

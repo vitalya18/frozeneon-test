@@ -151,7 +151,11 @@ class Post_model extends Emerald_Model
      */
     public function get_comments():array
     {
-       // TODO: task 2, комментирование
+       // TODO: task 2, комментирование +
+
+		$this->is_loaded(TRUE);
+
+		return Comment_model::get_all_by_assign_id($this->get_id());
     }
 
     /**
@@ -207,6 +211,18 @@ class Post_model extends Emerald_Model
         return static::transform_many(App::get_s()->from(self::CLASS_TABLE)->many());
     }
 
+	/**
+	 * @param int $id
+	 * @return self
+	 * @throws Exception
+	 */
+	public static function get_by_id(int $id): self
+	{
+		return static::transform_one(App::get_s()->from(self::CLASS_TABLE)
+			->where(['id' => $id])
+			->one());
+	}
+
     /**
      * @param User_model $user
      *
@@ -215,7 +231,10 @@ class Post_model extends Emerald_Model
      */
     public function increment_likes(User_model $user): bool
     {
-        // TODO: task 3, лайк поста
+        // TODO: task 3, лайк поста +
+
+		$user->set_likes_balance($user->get_likes_balance() - 1);
+		return $this->set_likes(intval($this->get_likes()) + 1);
     }
 
 
